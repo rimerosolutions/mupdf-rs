@@ -43,13 +43,15 @@ fn cp_r(dir: &Path, dest: &Path, excluding_dir_names: &'static [&'static str]) {
     }
 }
 
-const CPU_FLAGS: &[(&str, &str, &str, Option<&str>)] = &[
+const DEFAULT_CPU_FLAGS: &[(&str, &str, &str, Option<&str>)] = &[
     ("sse4.1", "-msse4.1", "HAVE_SSE4_1", Some("ARCH_HAS_SSE")),
     ("avx", "-mavx", "HAVE_AVX", None),
     ("avx2", "-mavx2", "HAVE_AVX2", None),
     ("fma", "-mfma", "HAVE_FMA", None),
-    ("neon", "-mfpu=neon", "HAVE_NEON", Some("ARCH_HAS_NEON")),
 ];
+
+const ARM_CPU_FLAGS: &[(&str, &str, &str, Option<&str>)] =
+    &[("neon", "-mfpu=neon", "HAVE_NEON", Some("ARCH_HAS_NEON"))];
 
 #[cfg(not(target_env = "msvc"))]
 fn build_libmupdf() {
@@ -99,8 +101,8 @@ fn build_libmupdf() {
         "libs".to_owned(),
         format!("build={}", profile),
         format!("OUT={}", &build_dir_str),
-        #[cfg(not(feature = "tesseract"))]
-        "USE_TESSERACT=no".to_owned(),
+        #[cfg(feature = "tesseract")]
+        "USE_TESSERACT=yes".to_owned(),
         #[cfg(not(feature = "libarchive"))]
         "USE_LIBARCHIVE=no".to_owned(),
         #[cfg(not(feature = "zxingcpp"))]
@@ -110,11 +112,19 @@ fn build_libmupdf() {
         "HAVE_X11=no".to_owned(),
         "HAVE_GLUT=no".to_owned(),
         "HAVE_CURL=no".to_owned(),
+        "USE_ARGUMENT_FILE=yes".to_owned(),
         "verbose=yes".to_owned(),
     ];
 
-    for (feature, flag, make_flag, define) in CPU_FLAGS {
-        let contains = target_features.contains(feature);
+        let mut cpu_flags = DEFAULT_CPU_FLAGS.to_vec();
+    let target_arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap_or_default();
+
+    if target_arch == "arm" {
+        cpu_flags.extend(ARM_CPU_FLAGS);
+    }
+
+    for (feature, flag, make_flag, define) in cpu_flags {
+        let contains = target_features.contains(&feature);
         if contains {
             build.flag_if_supported(flag);
 
