@@ -11,7 +11,7 @@ pub struct DocumentWriter {
 }
 
 impl DocumentWriter {
-       pub fn new<P: AsRef<FilePath> + ?Sized>(
+    pub fn new<P: AsRef<FilePath> + ?Sized>(
         filename: &P,
         format: &str,
         options: &str,
@@ -28,13 +28,10 @@ impl DocumentWriter {
             ))
         }
         .map(|inner| Self { inner })
-       }
+    }
 
-     #[cfg(feature = "tesseract")]
-    pub fn with_ocr<P: AsRef<FilePath> + ?Sized>(
-         path: &P,
-        options: &str,
-    ) -> Result<Self, Error> {
+    #[cfg(feature = "tesseract")]
+    pub fn with_ocr<P: AsRef<FilePath> + ?Sized>(path: &P, options: &str) -> Result<Self, Error> {
         let c_path = CString::new(path.as_ref().as_bytes())?;
         let c_options = CString::new(options)?;
 
