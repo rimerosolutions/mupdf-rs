@@ -528,11 +528,14 @@ fn main() {
 
     if let Ok(ref target_os) = env::var("CARGO_CFG_TARGET_OS") {
         if target_os == "windows" {
-            {
-                println!("cargo:rustc-link-lib=ucrt");
-                println!("cargo:rustc-link-lib=vcruntime");
-                println!("cargo:rustc-link-lib=msvcp140");
-            }
+            #[cfg(not(any(target_env = "msvc", target_env = "ucrt")))]
+            println!("cargo:rustc-link-lib=c++");
+
+            #[cfg(target_env = "msvc")]
+            println!("cargo:rustc-link-lib=msvcrt");
+
+            #[cfg(target_env = "ucrt")]
+            println!("cargo:rustc-link-lib=ucrt");
         } else if target_os == "macos" {
             println!("cargo:rustc-link-lib=c++");
         } else {
