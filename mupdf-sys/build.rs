@@ -112,7 +112,10 @@ fn build_libmupdf() {
         "HAVE_X11=no".to_owned(),
         "HAVE_GLUT=no".to_owned(),
         "HAVE_CURL=no".to_owned(),
-        "USE_ARGUMENT_FILE=yes".to_owned(),
+        // The parameter doesn't seem to have been implemented properly.
+        // - There's an error message about libmupdf.a.in not being found.
+        // - This will cause tests to fail under MYS2.
+        // "USE_ARGUMENT_FILE=yes".to_owned(),
         "verbose=yes".to_owned(),
     ];
 
