@@ -82,6 +82,7 @@ jobs:
           fetch-depth: 500
       - run: |
           rustc --version --verbose
+          set RUSTFLAGS=-C linker clang++
           cargo test --features serde
 
   asan:
