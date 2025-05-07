@@ -74,7 +74,7 @@ jobs:
       - uses: msys2/setup-msys2@v2
         with:
           msystem: ${{matrix.sys}}
-          install: mingw-w64-${{matrix.env}}-rust mingw-w64-${{matrix.env}}-clang base base-devel unzip git python3 mingw-w64-clang-x86_64-libc++
+          install: mingw-w64-${{matrix.env}}-rust mingw-w64-${{matrix.env}}-clang base base-devel unzip git python3 mingw-w64-clang-x86_64-libc++ gcc g++
 
       - uses: actions/checkout@v3
         with:
@@ -82,7 +82,7 @@ jobs:
           fetch-depth: 500
       - run: |
           rustc --version --verbose
-          set RUSTFLAGS=-C linker clang++
+          set RUSTFLAGS=-C linker g++
           cargo test --features serde
 
   asan:
