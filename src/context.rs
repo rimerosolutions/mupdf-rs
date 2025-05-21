@@ -1,5 +1,5 @@
 use std::cell::RefCell;
-use std::ffi::{CStr, CString};
+use std::ffi::{c_int, c_uint, CStr, CString};
 use std::ptr;
 use std::sync::Mutex;
 
@@ -85,6 +85,10 @@ impl Context {
             *ctx.borrow_mut() = RawContext(new_ctx);
             Self { inner: new_ctx }
         })
+    }
+
+    pub fn shrink_store(&mut self, percentage: usize) -> c_int {
+        unsafe { fz_shrink_store(self.inner, percentage as c_uint) }
     }
 
     pub fn enable_icc(&mut self) {
